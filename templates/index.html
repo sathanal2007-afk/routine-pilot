@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RoutinePilot | Student Daily Co-Pilot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-700 mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-sky-400">RoutinePilot</h1>
+        <p class="text-slate-400 text-sm mt-1">Smart Student Routine & English Co-Pilot</p>
+      </div>
+      <form action="/test-alert" method="post">
+        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+          🔔 Test Telegram Alert
+        </button>
+      </form>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Left Column: Daily Routine Timeline -->
+      <section class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700">
+        <h2 class="text-xl font-semibold mb-4 text-sky-300">⏰ Daily Schedule</h2>
+        
+        <!-- Add Task Form -->
+        <form action="/add-task" method="post" class="mb-6 space-y-3 bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+          <input type="text" name="title" placeholder="Task Title (e.g., Read Java)" required class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-sky-400"/>
+          <div class="flex gap-2">
+            <input type="time" name="alert_time" required class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm w-1/2 focus:outline-none focus:border-sky-400"/>
+            <select name="task_type" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm w-1/2 focus:outline-none focus:border-sky-400">
+              <option value="study">Study</option>
+              <option value="routine">Routine</option>
+              <option value="break">Break</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 py-2 rounded text-sm font-medium transition">Add to Routine</button>
+        </form>
+
+        <!-- Tasks Timeline -->
+        <div class="space-y-3">
+          {% for task in tasks %}
+          <div class="flex items-center justify-between p-3 rounded-lg bg-slate-800 border border-slate-700">
+            <div>
+              <p class="font-medium text-slate-200">{{ task.title }}</p>
+              <span class="text-xs uppercase tracking-wider text-sky-400 font-semibold">{{ task.task_type }}</span>
+            </div>
+            <span class="text-sm font-bold bg-slate-700 px-2.5 py-1 rounded text-slate-300">{{ task.alert_time }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Right Column: English Vocab & Dictionary -->
+      <section class="space-y-8">
+        
+        <!-- Dictionary Lookup -->
+        <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700">
+          <h2 class="text-xl font-semibold mb-4 text-amber-300">📖 Instant English Dictionary</h2>
+          <form action="/search-word" method="post" class="flex gap-2 mb-4">
+            <input type="text" name="word" placeholder="Type an English word (e.g. Tenacious)" required class="flex-grow bg-slate-900 border border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-amber-400"/>
+            <button type="submit" class="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded text-sm font-semibold transition">Search</button>
+          </form>
+
+          {% if dict_result %}
+            {% if dict_result.error %}
+              <p class="text-red-400 text-sm bg-red-950/40 p-3 rounded border border-red-800">{{ dict_result.error }}</p>
+            {% else %}
+              <div class="bg-slate-900/90 p-4 rounded-xl border border-amber-500/30">
+                <div class="flex items-baseline gap-2 mb-1">
+                  <h3 class="text-lg font-bold text-amber-300">{{ dict_result.word }}</h3>
+                  <span class="text-xs text-slate-400">({{ dict_result.part_of_speech }})</span>
+                </div>
+                <p class="text-sm text-slate-300 mt-1 font-medium">{{ dict_result.definition }}</p>
+                <p class="text-xs text-amber-200/80 mt-2 italic bg-amber-950/20 p-2 rounded">"{{ dict_result.example }}"</p>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- 10 Daily Vocab Section -->
+        <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700">
+          <h2 class="text-xl font-semibold mb-4 text-purple-300">🎯 Today's 10 Words (Day 1)</h2>
+          <div class="max-h-72 overflow-y-auto space-y-2 pr-1">
+            {% for v in vocab_words %}
+            <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-700">
+              <div class="flex justify-between">
+                <span class="font-bold text-purple-300">{{ loop.index }}. {{ v.word }}</span>
+                <span class="text-xs text-slate-400 font-medium">{{ v.tamil_meaning }}</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 italic">e.g., {{ v.example }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+
+</body>
+</html>
